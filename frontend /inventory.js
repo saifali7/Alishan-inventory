@@ -9,6 +9,8 @@ let itemsPerPage = 50;
 let totalPages = 1;
 
 // Initialize the page
+
+// Initialize the page
 async function initPage() {
     loadInventoryData();
     updateDashboard();
@@ -16,24 +18,43 @@ async function initPage() {
     updatePaginationControls();
     renderInventoryCards();
     await loadQualities();
-        // Initialize Google Cloud services
-    await initializeGoogleCloud();
     
-    
-    
-    
-        // ✅ YE NAYA CODE ADD KAREN - Backend se initialize karein
+    // ✅ INITIALIZE RENDER STORAGE (NEW)
     try {
-        await googleCloudManager.initializeGoogleApis();
-        console.log("✅ Google Cloud initialized with backend config");
+        await renderStorage.initialize();
+        console.log("✅ Render storage initialized");
+        
+        // Auto-load cloud data on startup (if local data is empty)
+        setTimeout(async () => {
+            try {
+                const cloudData = await renderStorage.loadFromBackend();
+                const localData = localStorage.getItem('inventoryItems');
+                
+                if (cloudData && (!localData || JSON.parse(localData).length === 0)) {
+                    // If local data is empty but cloud has data
+                    if (confirm('Cloud backup found! Would you like to load it?')) {
+                        await renderStorage.manualLoad();
+                    }
+                }
+            } catch (error) {
+                // Ignore - use local data
+                console.log('Auto-load skipped:', error.message);
+            }
+        }, 3000);
     } catch (error) {
-        console.error("❌ Google Cloud initialization failed:", error);
-        showNotification('Google Drive integration unavailable', 'warning');
+        console.error("❌ Render storage initialization failed:", error);
+        if (typeof showNotification === 'function') {
+            showNotification('❌ Cloud storage failed: ' + error.message, 'error');
+        }
     }
     
-    
-    
-    
+    // ✅ KEEP EXISTING GOOGLE CLOUD CODE (as fallback)
+    try {
+        await googleCloudManager.initializeGoogleApis();
+        console.log("✅ Google Cloud initialized (fallback)");
+    } catch (error) {
+        console.error("❌ Google Cloud initialization failed:", error);
+    }
     
     // Set up event listeners
     document.getElementById('editForm').addEventListener('submit', function(e) {
@@ -46,6 +67,10 @@ async function initPage() {
     
     console.log("Inventory page initialized with", inventoryItems.length, "items");
 }
+
+
+
+
 
 // Load inventory data from localStorage
 function loadInventoryData() {
