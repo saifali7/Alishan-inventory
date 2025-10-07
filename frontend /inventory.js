@@ -1,6 +1,7 @@
 
 
 
+
 // Data storage
 let inventoryItems = [];
 let filteredItems = [];
