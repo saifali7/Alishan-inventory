@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ALISHAN - Complete Inventory</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    
+    <link rel="stylesheet" href="inventory.css">
+    
+    <style>
+        /* Additional CSS for new storage section */
+        .cloud-storage-section .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .user-id-buttons {
+            display: flex;
+            gap: 5px;
+            justify-content: center;
+            margin-top: 10px;
+        }
+        .user-id-buttons button {
+            padding: 6px 10px;
+            font-size: 11px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="logo">
+                <i class="fas fa-tshirt logo-icon"></i>
+                <h1>ALISHAN</h1>
+            </div>
+            
+            <nav>
+                <ul>
+                    <li><a href="index.html"><i class="fas fa-home"></i> HOME</a></li>
+                    <li><a href="inventory.html" class="active"><i class="fas fa-database"></i> INVENTORY</a></li>
+                    <li><a href="report.html"><i class="fas fa-chart-bar"></i> REPORTS</a></li>
+                    <li><a href="setting.html"><i class="fas fa-cog"></i> SETTINGS</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <h2><i class="fas fa-database"></i> Complete Inventory</h2>
+        
+        <div class="dashboard-cards">
+            <div class="card">
+                <div class="card-icon">
+                    <i class="fas fa-boxes"></i>
+                </div>
+                <div class="card-content">
+                    <h3 id="totalItems">0</h3>
+                    <p>Total Items</p>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-icon">
+                    <i class="fas fa-money-bill-wave"></i>
+                </div>
+                <div class="card-content">
+                    <h3 id="totalValue">₹0</h3>
+                    <p>Total Inventory Value</p>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="card-content">
+                    <h3 id="inStockItems">0</h3>
+                    <p>In Stock Items</p>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="card-content">
+                    <h3 id="agingItems">0</h3>
+                    <p>Aging Stock (>8 Days)</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ✅ NEW CLOUD STORAGE SECTION -->
+        <div class="cloud-storage-section" style="text-align: center; margin: 20px 0; padding: 20px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+            <h3 style="color: white; margin-bottom: 20px; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                <i class="fas fa-database"></i> Cloud Storage ✅
+            </h3>
+            
+            <div class="storage-buttons" style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 15px;">
+                <button class="btn btn-save" onclick="renderStorage.manualSave()" style="background: white; color: #10b981; border: none; padding: 12px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
+                    <i class="fas fa-cloud-upload-alt"></i> Save to Cloud
+                </button>
+                
+                <button class="btn btn-load" onclick="renderStorage.manualLoad()" style="background: white; color: #10b981; border: none; padding: 12px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
+                    <i class="fas fa-cloud-download-alt"></i> Load from Cloud
+                </button>
+                
+                <button class="btn btn-sync" onclick="renderStorage.forceSync()" style="background: #f59e0b; color: white; border: none; padding: 12px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
+                    <i class="fas fa-sync"></i> Force Sync
+                </button>
+                
+                <button class="btn btn-status" onclick="showStorageStatus()" style="background: #8b5cf6; color: white; border: none; padding: 12px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
+                    <i class="fas fa-info-circle"></i> Status
+                </button>
+            </div>
+
+            <!-- User ID Management -->
+            <div class="user-id-buttons">
+                <button onclick="renderStorage.showUserId()" style="background: #3b82f6; color: white;">
+                    <i class="fas fa-copy"></i> Copy My ID
+                </button>
+                <button onclick="renderStorage.importUserId()" style="background: #8b5cf6; color: white;">
+                    <i class="fas fa-download"></i> Import ID
+                </button>
+            </div>
+            
+            <div id="storageStatus" style="margin-top: 15px; font-size: 14px; background: rgba(255,255,255,0.2); padding: 10px; border-radius: 8px;">
+                <div>Status: Initializing Cloud Storage...</div>
+                <div style="font-size: 12px; opacity: 0.9;">User ID: <span id="userIdDisplay">-</span></div>
+            </div>
+        </div>
+
+        <!-- EXISTING GOOGLE DRIVE SECTION (Keep as fallback) -->
+        <div class="google-drive-section" style="text-align: center; margin: 20px 0; padding: 15px; background: #f8f9fa; border-radius: 10px;">
+            <h3 style="color: #4361ee; margin-bottom: 15px;">
+                <i class="fab fa-google-drive"></i> Google Drive Backup (Legacy)
+            </h3>
+            
+            <div class="drive-buttons">
+                <button class="btn btn-connect" onclick="connectGoogleDrive()" id="connectDriveBtn">
+                    <i class="fab fa-google-drive"></i> Connect Google Drive
+                </button>
+                
+                <button class="btn btn-backup" onclick="backupToGoogleDrive()" id="backupDriveBtn">
+                    <i class="fas fa-cloud-upload-alt"></i> Backup to Drive
+                </button>
+            </div>
+            
+            <div id="driveStatus" style="margin-top: 10px; font-size: 14px; color: #666;">
+                Status: Not Connected
+            </div>
+        </div>
+
+        <div class="filters">
+            <div class="filter-group">
+                <label for="productTypeFilter">Product Type</label>
+                <select id="productTypeFilter">
+                    <option value="all">All Products</option>
+                    <option value="bra">Bra</option>
+                    <option value="panty">Panty</option>
+                    <option value="set">Set</option>
+                    <option value="blause">Blause</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="qualityFilter">Quality</label>
+                <select id="qualityFilter">
+                    <option value="all">All Qualities</option>
+                    <!-- Options will be populated by JavaScript -->
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label for="stockFilter">Stock Status</label>
+                <select id="stockFilter">
+                    <option value="all">All Status</option>
+                    <option value="inStock">In Stock</option>
+                    <option value="outOfStock">Out of Stock</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label for="dateFilter">Date Added</label>
+                <select id="dateFilter">
+                    <option value="all">All Dates</option>
+                    <option value="today">Today</option>
+                    <option value="week">This Week</option>
+                    <option value="month">This Month</option>
+                </select>
+            </div>
+            
+            <button class="btn" onclick="applyFilters()">Apply Filters</button>
+            <button class="btn btn-secondary" onclick="clearFilters()">Clear Filters</button>
+            <button class="btn btn-success" onclick="showExportModal()"><i class="fas fa-file-export"></i> Export</button>
+            <button class="btn btn-info" onclick="showImportModal()"><i class="fas fa-file-import"></i> Import</button>
+        </div>
+
+        <div class="search-container">
+            <input type="text" id="searchInput" class="search-input" placeholder="Search by quality, lot number, or notes..." onkeyup="handleSearch(event)">
+            <button class="search-btn" onclick="performSearch()"><i class="fas fa-search"></i> Search</button>
+        </div>
+
+        <div class="section">
+            <div class="section-header">
+                <div class="section-title">
+                    <i class="fas fa-list"></i>
+                    <span>All Inventory Items</span>
+                </div>
+                <button class="btn" onclick="location.href='index.html'">
+                    <i class="fas fa-plus"></i> Add New Item
+                </button>
+            </div>
+            
+            <div class="inventory-cards" id="inventoryCards">
+                <!-- Inventory cards will be added here dynamically -->
+            </div>
+
+            <div class="pagination-controls" id="paginationControls" style="display: none;">
+                <button class="btn btn-secondary" onclick="prevPage()">
+                    <i class="fas fa-chevron-left"></i> Previous
+                </button>
+                
+                <span id="pageInfo" class="page-info">Page 1 of 1</span>
+                
+                <button class="btn btn-secondary" onclick="nextPage()">
+                    Next <i class="fas fa-chevron-right"></i>
+                </button>
+                
+                <select class="page-select" onchange="changeItemsPerPage(this.value)">
+                    <option value="10">10 items</option>
+                    <option value="20">20 items</option>
+                    <option value="50" selected>50 items</option>
+                    <option value="100">100 items</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div class="modal" id="editModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Edit Product Entry</h2>
+                <div id="uniqueCodeDisplay" class="unique-code-display"></div>
+                <button class="close-btn" onclick="closeEditModal()">&times;</button>
+            </div>
+            <form id="editForm">
+                <input type="hidden" id="editIndex">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="editProductType">Product Type</label>
+                        <select id="editProductType" required onchange="updateEditQualityOptions(this.value)">
+                            <option value="">Select Type</option>
+                            <option value="bra">Bra</option>
+                            <option value="panty">Panty</option>
+                            <option value="set">Set</option>
+                            <option value="blause">Blause</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="editCupSize">Cup Size</label>
+                        <select id="editCupSize">
+                            <option value="">Select Cup Size</option>
+                            <option value="A">A Cup</option>
+                            <option value="B">B Cup</option>
+                            <option value="C">C Cup</option>
+                            <option value="D">D Cup</option>
+                            <option value="E">E Cup</option>
+                            <option value="F">F Cup</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="editLotNumber">Lot Number</label>
+                        <input type="text" id="editLotNumber" placeholder="Enter lot number">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="editQuality">Quality Name</label>
+                        <select id="editQuality" required>
+                            <option value="">Select Quality</option>
+                            <option value="LAZO">LAZO</option>
+                            <option value="ORRY">ORRY</option>
+                            <option value="NAIRA">NAIRA</option>
+                            <option value="EXOTIC">EXOTIC</option>
+                            <option value="PARFECTO">PARFECTO</option>
+                            <option value="ADDITION">ADDITION</option>
+                            <option value="JAXXON">JAXXON</option>
+                            <option value="CHARLIE">CHARLIE</option>
+                            <option value="KANISHKA">KANISHKA</option>
+                            <option value="FLORA">FLORA</option>
+                            <option value="EAZY">EAZY</option>
+                            <option value="NANCY">NANCY</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="editMaterial">Material (meters)</label>
+                        <input type="number" id="editMaterial" step="0.01" placeholder="Enter material in meters">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="editWeight">Weight (kg)</label>
+                        <input type="number" id="editWeight" step="0.01" placeholder="Enter weight in kg">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="editPrice">Price (per dozen)</label>
+                        <input type="number" id="editPrice" step="0.01" placeholder="Enter price per dozen">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="editColors">Colors (space separated)</label>
+                        <input type="text" id="editColors" placeholder="Red Blue Green">
+                    </div>
+                </div>
+                
+                <div class="size-option">
+                    <label>
+                        <input type="radio" name="editSizeOption" value="same" checked onchange="toggleEditSizeOption()">
+                        Same sizes for all colors
+                    </label>
+                    <label>
+                        <input type="radio" name="editSizeOption" value="different" onchange="toggleEditSizeOption()">
+                        Different sizes for each color
+                    </label>
+                </div>
+                
+                <h3>Size Quantities (in dozens)</h3>
+                
+                <div id="editSameSizesContainer">
+                    <div class="size-grid">
+                        <div class="size-input-group">
+                            <label for="editSize28">Size 28</label>
+                            <input type="number" id="editSize28" min="0" step="1" placeholder="Dozens">
+                        </div>
+                        <div class="size-input-group">
+                            <label for="editSize30">Size 30</label>
+                            <input type="number" id="editSize30" min="0" step="1" placeholder="Dozens">
+                        </div>
+                        <div class="size-input-group">
+                            <label for="editSize32">Size 32</label>
+                            <input type="number" id="editSize32" min="0" step="1" placeholder="Dozens">
+                        </div>
+                        <div class="size-input-group">
+                            <label for="editSize34">Size 34</label>
+                            <input type="number" id="editSize34" min="0" step="1" placeholder="Dozens">
+                        </div>
+                        <div class="size-input-group">
+                            <label for="editSize36">Size 36</label>
+                            <input type="number" id="editSize36" min="0" step="1" placeholder="Dozens">
+                        </div>
+                        <div class="size-input-group">
+                            <label for="editSize38">Size 38</label>
+                            <input type="number" id="editSize38" min="0" step="1" placeholder="Dozens">
+                        </div>
+                        <div class="size-input-group">
+                            <label for="editSize40">Size 40</label>
+                            <input type="number" id="editSize40" min="0" step="1" placeholder="Dozens">
+                        </div>
+                        <div class="size-input-group">
+                            <label for="editSize42">Size 42</label>
+                            <input type="number" id="editSize42" min="0" step="1" placeholder="Dozens">
+                        </div>
+                        <div class="size-input-group">
+                            <label for="editSize44">Size 44</label>
+                            <input type="number" id="editSize44" min="0" step="1" placeholder="Dozens">
+                        </div>
+                        <div class="size-input-group">
+                            <label for="editSize46">Size 46</label>
+                            <input type="number" id="editSize46" min="0" step="1" placeholder="Dozens">
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="editDifferentSizesContainer" class="color-size-container" style="display: none;">
+                    <div id="editColorSizeItems">
+                        <!-- Color size items will be added dynamically -->
+                    </div>
+                    <button type="button" class="add-color-btn" onclick="addEditColorSizeItem()">
+                        <i class="fas fa-plus"></i> Add Color with Sizes
+                    </button>
+                </div>
+                
+                <div class="form-group" style="margin-top: 20px;">
+                    <label for="editNotes">Notes</label>
+                    <textarea id="editNotes" rows="3" placeholder="Additional notes"></textarea>
+                </div>
+                
+                <button type="submit" class="btn">Update Product Entry</button>
+                <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Cancel</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Export Modal -->
+    <div class="modal" id="exportModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Export Inventory Data</div>
+                <button class="close-btn" onclick="closeExportModal()">&times;</button>
+            </div>
+            
+            <p>Select the format and data you want to export:</p>
+            
+            <div class="export-options">
+                <label class="export-option">
+                    <input type="checkbox" id="exportAll" checked> Export All Data
+                </label>
+                <label class="export-option">
+                    <input type="checkbox" id="exportFiltered"> Export Filtered Data Only
+                </label>
+            </div>
+            
+            <div class="export-buttons">
+                <button class="btn btn-success" onclick="exportInventory('excel')">
+                    <i class="fas fa-file-excel"></i> Export as Excel
+                </button>
+                <button class="btn btn-secondary" onclick="exportInventory('csv')">
+                    <i class="fas fa-file-csv"></i> Export as CSV
+                </button>
+                <button class="btn btn-info" onclick="exportCompleteBackup()">
+                    <i class="fas fa-download"></i> Complete Backup
+                </button>
+                <!-- Advanced Export Button Added -->
+                <button class="btn btn-warning" onclick="showAdvancedExportModal()">
+                    <i class="fas fa-cogs"></i> Advanced Export
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Advanced Export Modal - NEW ADDED -->
+    <div class="modal" id="advancedExportModal">
+        <div class="modal-content" style="max-width: 700px;">
+            <div class="modal-header">
+                <h2>🚀 Advanced Data Export</h2>
+                <button class="close-btn" onclick="closeAdvancedExportModal()">&times;</button>
+            </div>
+            
+            <div class="export-options">
+                <!-- Export Type Selection -->
+                <div class="form-group">
+                    <label><i class="fas fa-filter"></i> Export Type</label>
+                    <select id="exportType" onchange="toggleExportOptions()" class="form-control">
+                        <option value="complete">📦 Complete Data</option>
+                        <option value="dateRange">📅 Date Range</option>
+                        <option value="quality">🎯 By Quality</option>
+                        <option value="productType">👕 By Product Type</option>
+                        <option value="lotNumber">🏷️ By Lot Number</option>
+                        <option value="uniqueCode">🔖 By Unique Code</option>
+                        <option value="customFilter">🔧 Custom Filter</option>
+                    </select>
+                </div>
+
+                <!-- Date Range Options -->
+                <div id="dateRangeOptions" class="export-sub-options" style="display: none;">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>From Date</label>
+                            <input type="date" id="exportFromDate" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label>To Date</label>
+                            <input type="date" id="exportToDate" class="form-control">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quality Options -->
+                <div id="qualityOptions" class="export-sub-options" style="display: none;">
+                    <div class="form-group">
+                        <label>Select Quality</label>
+                        <select id="exportQuality" class="form-control">
+                            <option value="">All Qualities</option>
+                            <!-- JavaScript se populate hoga -->
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Product Type Options -->
+                <div id="productTypeOptions" class="export-sub-options" style="display: none;">
+                    <div class="form-group">
+                        <label>Select Product Type</label>
+                        <select id="exportProductType" class="form-control">
+                            <option value="all">All Types</option>
+                            <option value="bra">Bra</option>
+                            <option value="panty">Panty</option>
+                            <option value="set">Set</option>
+                            <option value="blause">Blause</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Lot Number Options -->
+                <div id="lotNumberOptions" class="export-sub-options" style="display: none;">
+                    <div class="form-group">
+                        <label>Enter Lot Number</label>
+                        <input type="text" id="exportLotNumber" class="form-control" placeholder="e.g., LOT-2024-001">
+                    </div>
+                </div>
+
+                <!-- Unique Code Options -->
+                <div id="uniqueCodeOptions" class="export-sub-options" style="display: none;">
+                    <div class="form-group">
+                        <label>Enter Unique Code</label>
+                        <input type="text" id="exportUniqueCode" class="form-control" placeholder="e.g., BRA-LAZO-12345">
+                    </div>
+                </div>
+
+                <!-- Custom Filter Options -->
+                <div id="customFilterOptions" class="export-sub-options" style="display: none;">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Product Type</label>
+                            <select id="customProductType" class="form-control">
+                                <option value="">All Types</option>
+                                <option value="bra">Bra</option>
+                                <option value="panty">Panty</option>
+                                <option value="set">Set</option>
+                                <option value="blause">Blause</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Quality</label>
+                            <select id="customQuality" class="form-control">
+                                <option value="">All Qualities</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Stock Status</label>
+                            <select id="customStockStatus" class="form-control">
+                                <option value="all">All Status</option>
+                                <option value="inStock">In Stock Only</option>
+                                <option value="outOfStock">Out of Stock Only</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- File Name Customization -->
+                <div class="form-group">
+                    <label><i class="fas fa-file-signature"></i> Custom File Name</label>
+                    <input type="text" id="exportFileName" class="form-control" placeholder="Optional custom name">
+                </div>
+
+                <!-- Export Summary -->
+                <div id="exportSummary" class="export-summary">
+                    <h4><i class="fas fa-chart-bar"></i> Export Summary</h4>
+                    <div class="summary-content">
+                        <p id="summaryText">No data selected for export</p>
+                        <div id="summaryDetails" class="summary-details"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="export-buttons" style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <button class="btn btn-info" onclick="updateExportSummary()">
+                    <i class="fas fa-sync"></i> Update Preview
+                </button>
+                <button class="btn btn-success" onclick="executeAdvancedExport()">
+                    <i class="fas fa-download"></i> Export Selected Data
+                </button>
+                <button class="btn btn-secondary" onclick="closeAdvancedExportModal()">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Import Modal -->
+    <div class="modal" id="importModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Import Inventory Data</h2>
+                <button class="close-btn" onclick="closeImportModal()">&times;</button>
+            </div>
+            
+            <div class="form-group">
+                <label>Select Backup File (.json)</label>
+                <input type="file" id="importFile" accept=".json" class="form-control">
+            </div>
+            
+            <div class="import-options">
+                <label class="import-option">
+                    <input type="radio" name="importOption" value="replace" checked>
+                    Replace All Current Data
+                </label>
+                <label class="import-option">
+                    <input type="radio" name="importOption" value="merge">
+                    Merge with Existing Data
+                </label>
+            </div>
+            
+            <button class="btn btn-success" onclick="handleImport()">
+                <i class="fas fa-upload"></i> Import Data
+            </button>
+            <button class="btn btn-secondary" onclick="closeImportModal()">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Backup Settings Modal -->
+    <div class="modal" id="backupSettingsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Backup Settings</h2>
+                <button class="close-btn" onclick="closeBackupSettingsModal()">&times;</button>
+            </div>
+            
+            <div class="form-group">
+                <label>Auto Backup Frequency</label>
+                <select id="backupFrequency">
+                    <option value="6">Every 6 Hours</option>
+                    <option value="12">Every 12 Hours</option>
+                    <option value="24" selected>Every 24 Hours</option>
+                    <option value="0">Manual Only</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="autoBackupEnabled" checked>
+                    Enable Auto Backup
+                </label>
+            </div>
+            
+            <div class="backup-actions">
+                <button class="btn btn-success" onclick="createBackupNow()">
+                    <i class="fas fa-save"></i> Create Backup Now
+                </button>
+                <button class="btn btn-info" onclick="showBackupHistory()">
+                    <i class="fas fa-history"></i> Backup History
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Container -->
+    <div class="notification-container" id="notificationContainer"></div>
+    
+    <!-- Scripts -->
+    <script src="inventory.js" type="text/javascript" charset="utf-8"></script>
+    
+    <!-- Google Cloud Scripts (Keep as fallback) -->
+    <script src="https://apis.google.com/js/api.js"></script>
+    <script src="https://accounts.google.com/gsi/client"></script>
+    <script src="config.js"></script>
+    <script src="google-cloud-config.js"></script>
+
+    <!-- ✅ NEW RENDER STORAGE SCRIPT -->
+    <script src="render-storage.js"></script>
+
+    <script>
+        // Storage status functions
+        async function showStorageStatus() {
+            const status = await renderStorage.getSyncStatus();
+            const statusElement = document.getElementById('storageStatus');
+            
+            if (!statusElement) return;
+            
+            if (status.connected && status.databaseConnected) {
+                let statusHTML = `
+                    <div style="color: #4ade80; font-weight: 600;">✅ Cloud Storage Connected</div>
+                    <div style="font-size: 12px; margin-top: 5px;">
+                        User: ${status.userId}<br>
+                        Last Save: ${status.lastSave ? new Date(status.lastSave).toLocaleString() : 'Never'}<br>
+                        Last Load: ${status.lastLoad ? new Date(status.lastLoad).toLocaleString() : 'Never'}<br>
+                        Sync History: ${status.syncHistory.length} records
+                    </div>
+                `;
+                statusElement.innerHTML = statusHTML;
+            } else {
+                statusElement.innerHTML = `
+                    <div style="color: #ef4444; font-weight: 600;">❌ Cloud Storage Disconnected</div>
+                    <div style="font-size: 12px; margin-top: 5px;">${status.error || 'Check connection'}</div>
+                `;
+            }
+        }
+
+        // Auto-update status on page load
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Initial status check
+            setTimeout(showStorageStatus, 2000);
+            
+            // Auto status update every 30 seconds
+            setInterval(showStorageStatus, 30000);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ALISHAN - Inventory Management</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <div class="mobile-header">
+    <div class="logo">
+        <i class="fas fa-tshirt logo-icon"></i>
+        <h1>ALISHAN</h1>
+    </div>
+    
+    <!-- Desktop Navigation - Always visible on desktop -->
+    <nav class="desktop-nav">
+        <ul>
+            <li><a href="index.html" class="active"><i class="fas fa-home"></i> HOME</a></li>
+            <li><a href="inventory.html"><i class="fas fa-database"></i> INVENTORY</a></li>
+            <li><a href="report.html"><i class="fas fa-chart-bar"></i> REPORTS</a></li>
+            <li><a href="setting.html"><i class="fas fa-cog"></i> SETTINGS</a></li>
+        </ul>
+    </nav>
+    
+    <!-- Mobile Navigation Toggle - Only for mobile -->
+    <button class="menu-toggle" id="menuToggle">
+        <i class="fas fa-bars"></i>
+    </button>
+    
+    <!-- Mobile Navigation Menu - Hidden by default -->
+    <nav class="mobile-nav" id="mobileNav">
+        <ul>
+            <li><a href="index.html" class="active"><i class="fas fa-home"></i> HOME</a></li>
+            <li><a href="inventory.html"><i class="fas fa-database"></i> INVENTORY</a></li>
+            <li><a href="report.html"><i class="fas fa-chart-bar"></i> REPORTS</a></li>
+            <li><a href="setting.html"><i class="fas fa-cog"></i> SETTINGS</a></li>
+        </ul>
+    </nav>
+</div>
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-tshirt logo-icon"></i>
+                    <h1>ALISHAN</h1>
+                </div>
+            </div>
+            
+            <nav>
+                <ul>
+                    <li><a href="index.html" class="active"><i class="fas fa-home"></i> HOME</a></li>
+                    <li><a href="inventory.html"><i class="fas fa-database"></i> INVENTORY</a></li>
+                    <li><a href="report.html"><i class="fas fa-chart-bar"></i> REPORTS</a></li>
+                    <li><a href="setting.html"><i class="fas fa-cog"></i> SETTINGS</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div class="main-content">
+        <div class="container">
+                <!-- Search Container - ENHANCED VERSION -->
+                <div class="search-container">
+                    <div class="search-bar-wrapper">
+                        <div class="search-bar">
+                            <input type="text" id="searchInput" placeholder="Search by quality name, lot number, cup size or color...">
+                            <button id="searchBtn" onclick="performSearch()">
+                                <i class="fas fa-search"></i> Search
+                            </button>
+                        </div>
+                        <!-- Suggestions dropdown will be added here dynamically -->
+                    </div>
+                    <button class="show-all-btn" id="showAllBtn" style="display: none;">
+                        <i class="fas fa-list"></i> Show All
+                    </button>
+                    
+                    <!-- Search Analytics Button (Optional) -->
+                    <button class="analytics-btn" onclick="showSearchAnalytics()" title="View Search Analytics">
+                        <i class="fas fa-chart-bar"></i>
+                    </button>
+                </div>
+                
+                <!-- Analytics Modal -->
+                <div class="modal" id="analyticsModal" style="display: none;">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h2><i class="fas fa-chart-line"></i> Search Analytics</h2>
+                            <button class="close-btn" onclick="closeModal('analyticsModal')">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="analytics-container" id="analyticsContainer">
+                                <!-- Analytics content will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+           
+           
+           
+           
+           
+           
+            <div class="main-content">
+                <div class="dashboard">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2><i class="fas fa-boxes"></i> Total Inventory</h2>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="stat-item">
+                            <h3 id="totalInventoryItems">0</h3>
+                            <p>Total Items</p>
+                        </div>
+                        <div class="card-chart">
+                            <div class="chart-bar" style="height: 60%;"></div>
+                            <div class="chart-bar" style="height: 80%;"></div>
+                            <div class="chart-bar" style="height: 45%;"></div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h2><i class="fas fa-bolt"></i> Quick Actions</h2>
+                        </div>
+                        <div class="quick-actions">
+                            <button class="action-btn" onclick="scrollToForm()">
+                                <i class="fas fa-plus"></i> Add New Item
+                            </button>
+                            <!-- CHANGE YEH LINE -->
+                            <button class="action-btn" onclick="generateReport()">
+                                    <i class="fas fa-file-excel"></i> Export Excel Report
+                            </button>
+                            <button class="action-btn" onclick="checkStock()">
+                                <i class="fas fa-search"></i> Check Stock
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h2><i class="fas fa-history"></i> Recent Activity</h2>
+                        </div>
+                        <ul class="activity-feed" id="activityFeed">
+                            <li>No recent activity</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h2><i class="fas fa-plus-circle"></i> Add New Product Entry</h2>
+                    <form id="productForm">
+                        <div class="form-tabs">
+                            <button type="button" class="tab-btn active" data-tab="basic">Basic Info</button>
+                            <button type="button" class="tab-btn" data-tab="sizes">Sizes & Colors</button>
+                            <button type="button" class="tab-btn" data-tab="additional">Additional Info</button>
+                        </div>
+
+                        <div class="tab-content active" id="basic-tab">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="productType">Product Type</label>
+                                    <select id="productType" required onchange="updateQualityOptions(this.value)">
+                                        <option value="">Select Type</option>
+                                        <option value="bra">Bra</option>
+                                        <option value="panty">Panty</option>
+                                        <option value="set">Set</option>
+                                        <option value="blause">blause</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="cupSize">Cup Size</label>
+                                    <select id="cupSize">
+                                        <option value="">Select Cup Size</option>
+                                        <option value="A">A Cup</option>
+                                        <option value="B">B Cup</option>
+                                        <option value="C">C Cup</option>
+                                        <option value="D">D Cup</option>
+                                        <option value="E">E Cup</option>
+                                        <option value="F">F Cup</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="lotNumber">Lot Number</label>
+                                    <input type="number" id="lotNumber" placeholder="Enter lot number">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="quality">Quality Name</label>
+                                    <select id="quality" required>
+                                        <option value="">Select Quality</option>
+                                        <option value="LAZO">LAZO</option>
+                                        <option value="ORRY">ORRY</option>
+                                        <option value="NAIRA">NAIRA</option>
+                                        <option value="EXOTIC">EXOTIC</option>
+                                        <option value="PARFECTO">PARFECTO</option>
+                                        <option value="ADDITION">ADDITION</option>
+                                        <option value="JAXXON">JAXXON</option>
+                                        <option value="CHARLIE">CHARLIE</option>
+                                        <option value="KANISHKA">KANISHKA</option>
+                                        <option value="FLORA">FLORA</option>
+                                        <option value="EAZY">EAZY</option>
+                                        <option value="NANCY">NANCY</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="material">Material (meters)</label>
+                                    <input type="number" id="material" step="0.01" placeholder="Enter material in meters">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="weight">Weight (kg)</label>
+                                    <input type="number" id="weight" step="0.01" placeholder="Enter weight in kg">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="price">Price (per dozen)</label>
+                                    <input type="number" id="price" step="0.01" placeholder="Enter price per dozen">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="colors">Colors (space separated)</label>
+                                    <div class="color-input-container">
+                                        <input type="text" id="colors" placeholder="Red Blue Green">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="tab-content" id="sizes-tab">
+                            <div class="size-option">
+                                <label>
+                                    <input type="radio" name="sizeOption" value="same" checked onchange="toggleSizeOption()">
+                                    Same sizes for all colors
+                                </label>
+                                <label>
+                                    <input type="radio" name="sizeOption" value="different" onchange="toggleSizeOption()">
+                                    Different sizes for each color
+                                </label>
+                            </div>
+                            
+                            <h3>Size Quantities (in dozens)</h3>
+                            
+                            <div id="sameSizesContainer">
+                                <div class="size-grid">
+                                    <div class="size-input-group">
+                                        <label for="size28">Size 28</label>
+                                        <input type="number" id="size28" min="0" step="1" placeholder="Dozens">
+                                    </div>
+                                    <div class="size-input-group">
+                                        <label for="size30">Size 30</label>
+                                        <input type="number" id="size30" min="0" step="1" placeholder="Dozens">
+                                    </div>
+                                    <div class="size-input-group">
+                                        <label for="size32">Size 32</label>
+                                        <input type="number" id="size32" min="0" step="1" placeholder="Dozens">
+                                    </div>
+                                    <div class="size-input-group">
+                                        <label for="size34">Size 34</label>
+                                        <input type="number" id="size34" min="0" step="1" placeholder="Dozens">
+                                    </div>
+                                    <div class="size-input-group">
+                                        <label for="size36">Size 36</label>
+                                        <input type="number" id="size36" min="0" step="1" placeholder="Dozens">
+                                    </div>
+                                    <div class="size-input-group">
+                                        <label for="size38">Size 38</label>
+                                        <input type="number" id="size38" min="0" step="1" placeholder="Dozens">
+                                    </div>
+                                    <div class="size-input-group">
+                                        <label for="size40">Size 40</label>
+                                        <input type="number" id="size40" min="0" step="1" placeholder="Dozens">
+                                    </div>
+                                    <div class="size-input-group">
+                                        <label for="size42">Size 42</label>
+                                        <input type="number" id="size42" min="0" step="1" placeholder="Dozens">
+                                    </div>
+                                    <div class="size-input-group">
+                                        <label for="size44">Size 44</label>
+                                        <input type="number" id="size44" min="0" step="1" placeholder="Dozens">
+                                    </div>
+                                    <div class="size-input-group">
+                                        <label for="size46">Size 46</label>
+                                        <input type="number" id="size46" min="0" step="1" placeholder="Dozens">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div id="differentSizesContainer" class="color-size-container">
+                                <div id="colorSizeItems">
+                                    <!-- Color size items will be added dynamically -->
+                                </div>
+                                <button type="button" class="add-color-btn" onclick="addColorSizeItem()">
+                                    <i class="fas fa-plus"></i> Add Color with Sizes
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="tab-content" id="additional-tab">
+                            <div class="form-group" style="margin-top: 20px;">
+                                <label for="notes">Notes</label>
+                                <textarea id="notes" rows="3" placeholder="Additional notes"></textarea>
+                            </div>
+                            
+                            <button type="submit" class="btn">Add Product Entry</button>
+                            <button type="reset" class="btn btn-secondary">Reset Form</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="form-section">
+                    <h2><i class="fas fa-list"></i> Inventory Summary</h2>
+                    <div class="inventory-cards" id="inventoryCards">
+                        <!-- Inventory cards will be added here dynamically -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="editModal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Edit Product Entry</h2>
+                <div id="uniqueCodeDisplay" class="unique-code-display"></div>
+                <button class="close-btn" onclick="closeEditModal()">&times;</button>
+            </div>
+            <form id="editForm">
+                <input type="hidden" id="editIndex">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="editProductType">Product Type</label>
+                        <select id="editProductType" required onchange="updateEditQualityOptions(this.value)">
+                            <option value="">Select Type</option>
+                            <option value="bra">Bra</option>
+                            <option value="panty">Panty</option>
+                            <option value="set">Set</option>
+                            <option value="blause">blause</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="editCupSize">Cup Size</label>
+                        <select id="editCupSize">
+                            <option value="">Select Cup Size</option>
+                            <option value="A">A Cup</option>
+                            <option value="B">B Cup</option>
+                            <option value="C">C Cup</option>
+                            <option value="D">D Cup</option>
+                            <option value="E">E Cup</option>
+                            <option value="F">F Cup</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="editLotNumber">Lot Number</label>
+                        <input type="text" id="editLotNumber" placeholder="Enter lot number">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="editQuality">Quality Name</label>
+                        <select id="editQuality" required>
+                            <option value="">Select Quality</option>
+                            <option value="LAZO">LAZO</option>
+                            <option value="ORRY">ORRY</option>
+                            <option value="NAIRA">NAIRA</option>
+                            <option value="EXOTIC">EXOTIC</option>
+                            <option value="PARFECTO">PARFECTO</option>
+                            <option value="ADDITION">ADDITION</option>
+                            <option value="JAXXON">JAXXON</option>
+                            <option value="CHARLIE">CHARLIE</option>
+                            <option value="KANISHKA">KANISHKA</option>
+                            <option value="FLORA">FLORA</option>
+                            <option value="EAZY">EAZY</option>
+                            <option value="NANCY">NANCY</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="editMaterial">Material (meters)</label>
+                        <input type="number" id="editMaterial" step="0.01" placeholder="Enter material in meters">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="editWeight">Weight (kg)</label>
+                        <input type="number" id="editWeight" step="0.01" placeholder="Enter weight in kg">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="editPrice">Price (per dozen)</label>
+                        <input type="number" id="editPrice" step="0.01" placeholder="Enter price per dozen">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="editColors">Colors (space separated)</label>
+                        <input type="text" id="editColors" placeholder="Red Blue Green">
+                    </div>
+                </div>
+                
+                <div class="size-option">
+                    <label>
+                        <input type="radio" name="editSizeOption" value="same" checked onchange="toggleEditSizeOption()">
+                        Same sizes for all colors
+                    </label>
+                    <label>
+                        <input type="radio" name="editSizeOption" value="different" onchange="toggleEditSizeOption()">
+                        Different sizes for each color
+                    </label>
+                </div>
+                
+                <h3>Size Quantities (in dozens)</h3>
+                
+                <div id="editSameSizesContainer">
+                    <div class="size-grid">
+                        <div class="size-input-group">
+                            <label for="editSize28">Size 28</label>
+                            <input type="number" id="editSize28" min="0" step="1" placeholder="Dozens">
+                        </div>
+                        <div class="size-input-group">
+                            <label for="editSize30">Size 30</label>
+                            <input type="number" id="editSize30" min="0" step="1" placeholder="Dozens">
+                        </div>
+                        <div class="size-input-group">
+                            <label for="editSize32">Size 32</label>
+                            <input type="number" id="editSize32" min="0" step="1" placeholder="Dozens">
+                        </div>
+                        <div class="size-input-group">
+                            <label for="editSize34">Size 34</label>
+                            <input type="number" id="editSize34" min="0" step="1" placeholder="Dozens">
+                        </div>
+                        <div class="size-input-group">
+                            <label for="editSize36">Size 36</label>
+                            <input type="number" id="editSize36" min="0" step="1" placeholder="Dozens">
+                        </div>
+                        <div class="size-input-group">
+                            <label for="editSize38">Size 38</label>
+                            <input type="number" id="editSize38" min="0" step="1" placeholder="Dozens">
+                        </div>
+                        <div class="size-input-group">
+                            <label for="editSize40">Size 40</label>
+                            <input type="number" id="editSize40" min="0" step="1" placeholder="Dozens">
+                        </div>
+                        <div class="size-input-group">
+                            <label for="editSize42">Size 42</label>
+                            <input type="number" id="editSize42" min="0" step="1" placeholder="Dozens">
+                        </div>
+                        <div class="size-input-group">
+                            <label for="editSize44">Size 44</label>
+                            <input type="number" id="editSize44" min="0" step="1" placeholder="Dozens">
+                        </div>
+                        <div class="size-input-group">
+                            <label for="editSize46">Size 46</label>
+                            <input type="number" id="editSize46" min="0" step="1" placeholder="Dozens">
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="editDifferentSizesContainer" class="color-size-container" style="display: none;">
+                    <div id="editColorSizeItems">
+                        <!-- Color size items will be added dynamically -->
+                    </div>
+                    <button type="button" class="add-color-btn" onclick="addEditColorSizeItem()">
+                        <i class="fas fa-plus"></i> Add Color with Sizes
+                    </button>
+                </div>
+                
+                <div class="form-group" style="margin-top: 20px;">
+                    <label for="editNotes">Notes</label>
+                    <textarea id="editNotes" rows="3" placeholder="Additional notes"></textarea>
+                </div>
+                
+                <button type="submit" class="btn">Update Product Entry</button>
+                <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Cancel</button>
+            </form>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2023 ALISHAN Garment Inventory Management System. All rights reserved.</p>
+    </footer>
+<!-- YEH CODE ADD KARNA HAI -->
+<!-- Pagination Controls -->
+<div class="pagination-controls" id="paginationControls" style="display: none;">
+    <button class="btn btn-secondary" onclick="prevPage()">
+        <i class="fas fa-chevron-left"></i> Previous
+    </button>
+    
+    <span id="pageInfo" class="page-info">Page 1 of 1</span>
+    
+    <button class="btn btn-secondary" onclick="nextPage()">
+        Next <i class="fas fa-chevron-right"></i>
+    </button>
+    
+    <select class="page-select" onchange="changeItemsPerPage(this.value)">
+        <option value="10">10 items</option>
+        <option value="20">20 items</option>
+        <option value="50" selected>50 items</option>
+        <option value="100">100 items</option>
+    </select>
+</div>
+    <div class="notification-container" id="notificationContainer"></div>
+    
+
+    <script src="script2.js"></script>
+    <!-- Excel Export ke liye (report.html se copy karien) -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+</body>
+</html>
