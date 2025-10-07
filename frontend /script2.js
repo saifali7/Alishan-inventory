@@ -1,5 +1,6 @@
 
 
+
 // ================= ENHANCED SEARCH VARIABLES =================
 let searchHistory = JSON.parse(localStorage.getItem('searchHistory')) || [];
 let searchAnalytics = JSON.parse(localStorage.getItem('searchAnalytics')) || {};
