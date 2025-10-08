@@ -11,7 +11,7 @@ let totalPages = 1;
 
 // Initialize the page
 
-// Initialize the page
+// Initialize the page - COMPLETE UPDATED VERSION
 async function initPage() {
     loadInventoryData();
     updateDashboard();
@@ -20,7 +20,7 @@ async function initPage() {
     renderInventoryCards();
     await loadQualities();
     
-    // ✅ INITIALIZE RENDER STORAGE (NEW)
+    // ✅ NEW: INITIALIZE RENDER STORAGE (ADD THIS BLOCK)
     try {
         await renderStorage.initialize();
         console.log("✅ Render storage initialized");
@@ -57,6 +57,21 @@ async function initPage() {
         console.error("❌ Google Cloud initialization failed:", error);
     }
     
+    
+    
+    // ✅ YE NAYA CODE ADD KAREN - Backend se initialize karein
+    try {
+        await googleCloudManager.initializeGoogleApis();
+        console.log("✅ Google Cloud initialized with backend config");
+    } catch (error) {
+        console.error("❌ Google Cloud initialization failed:", error);
+        showNotification('Google Drive integration unavailable', 'warning');
+    }
+    
+    
+    
+    
+    
     // Set up event listeners
     document.getElementById('editForm').addEventListener('submit', function(e) {
         e.preventDefault();
@@ -68,7 +83,6 @@ async function initPage() {
     
     console.log("Inventory page initialized with", inventoryItems.length, "items");
 }
-
 
 
 
