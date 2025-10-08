@@ -16,7 +16,7 @@ class RenderStorageManager {
             return 'http://localhost:3000';
         } else {
             // ✅ APNA RENDER BACKEND URL YAHAN DALEN
-            return 'https://alishanapp.onrender.com';
+            return 'https://alishan-backend.onrender.com';
         }
     }
 
