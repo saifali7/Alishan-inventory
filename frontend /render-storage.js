@@ -1,23 +1,12 @@
-
 // Render Backend Storage Manager - Complete Solution
 class RenderStorageManager {
     constructor() {
-        this.backendUrl = this.getBackendUrl();
+        // ✅ APNA ACTUAL RENDER BACKEND URL YAHAN DALEN
+        this.backendUrl = 'https://alishan-backend.onrender.com';
         this.userId = this.getUserId();
         this.autoSaveEnabled = true;
         this.autoSaveInterval = 30000; // 30 seconds
         this.isInitialized = false;
-    }
-
-    getBackendUrl() {
-        const currentDomain = window.location.hostname;
-        
-        if (currentDomain === 'localhost' || currentDomain === '127.0.0.1') {
-            return 'http://localhost:3000';
-        } else {
-            // ✅ APNA RENDER BACKEND URL YAHAN DALEN
-            return 'https://alishan-backend.onrender.com';
-        }
     }
 
     getUserId() {
@@ -43,6 +32,7 @@ class RenderStorageManager {
                 showNotification('✅ User ID copied to clipboard!', 'success');
             }
         }).catch(() => {
+            // Fallback - show prompt
             prompt('Copy your User ID:', userId);
         });
     }
@@ -307,17 +297,12 @@ class RenderStorageManager {
             const lastSave = localStorage.getItem('lastBackendSave');
             const lastLoad = localStorage.getItem('lastBackendLoad');
             
-            // Get sync history
-            const historyResponse = await fetch(`${this.backendUrl}/api/inventory/history/${this.userId}`);
-            const historyData = await historyResponse.json();
-            
             return {
                 initialized: this.isInitialized,
                 connected: connection.connected,
                 databaseConnected: connection.databaseConnected,
                 lastSave: lastSave,
                 lastLoad: lastLoad,
-                syncHistory: historyData.success ? historyData.history : [],
                 userId: this.userId,
                 backendUrl: this.backendUrl
             };
