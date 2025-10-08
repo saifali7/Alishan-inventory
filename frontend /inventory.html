@@ -96,45 +96,59 @@
             </div>
         </div>
 
-        <!-- ✅ NEW CLOUD STORAGE SECTION -->
-        <div class="cloud-storage-section" style="text-align: center; margin: 20px 0; padding: 20px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
-            <h3 style="color: white; margin-bottom: 20px; display: flex; align-items: center; justify-content: center; gap: 10px;">
-                <i class="fas fa-database"></i> Cloud Storage ✅
-            </h3>
-            
-            <div class="storage-buttons" style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 15px;">
-                <button class="btn btn-save" onclick="renderStorage.manualSave()" style="background: white; color: #10b981; border: none; padding: 12px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
-                    <i class="fas fa-cloud-upload-alt"></i> Save to Cloud
-                </button>
-                
-                <button class="btn btn-load" onclick="renderStorage.manualLoad()" style="background: white; color: #10b981; border: none; padding: 12px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
-                    <i class="fas fa-cloud-download-alt"></i> Load from Cloud
-                </button>
-                
-                <button class="btn btn-sync" onclick="renderStorage.forceSync()" style="background: #f59e0b; color: white; border: none; padding: 12px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
-                    <i class="fas fa-sync"></i> Force Sync
-                </button>
-                
-                <button class="btn btn-status" onclick="showStorageStatus()" style="background: #8b5cf6; color: white; border: none; padding: 12px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
-                    <i class="fas fa-info-circle"></i> Status
-                </button>
-            </div>
+       
 
-            <!-- User ID Management -->
-            <div class="user-id-buttons">
-                <button onclick="renderStorage.showUserId()" style="background: #3b82f6; color: white;">
-                    <i class="fas fa-copy"></i> Copy My ID
-                </button>
-                <button onclick="renderStorage.importUserId()" style="background: #8b5cf6; color: white;">
-                    <i class="fas fa-download"></i> Import ID
-                </button>
-            </div>
-            
-            <div id="storageStatus" style="margin-top: 15px; font-size: 14px; background: rgba(255,255,255,0.2); padding: 10px; border-radius: 8px;">
-                <div>Status: Initializing Cloud Storage...</div>
-                <div style="font-size: 12px; opacity: 0.9;">User ID: <span id="userIdDisplay">-</span></div>
-            </div>
-        </div>
+
+
+
+<!-- ✅ ADD THIS SECTION after Google Drive section -->
+<div class="cloud-storage-section" style="text-align: center; margin: 20px 0; padding: 20px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+    <h3 style="color: white; margin-bottom: 20px; display: flex; align-items: center; justify-content: center; gap: 10px;">
+        <i class="fas fa-database"></i> Cloud Storage ✅
+    </h3>
+    
+    <div class="storage-buttons" style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 15px;">
+        <button class="btn btn-save" onclick="renderStorage.manualSave()" style="background: white; color: #10b981; border: none; padding: 12px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
+            <i class="fas fa-cloud-upload-alt"></i> Save to Cloud
+        </button>
+        
+        <button class="btn btn-load" onclick="renderStorage.manualLoad()" style="background: white; color: #10b981; border: none; padding: 12px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
+            <i class="fas fa-cloud-download-alt"></i> Load from Cloud
+        </button>
+        
+        <button class="btn btn-sync" onclick="renderStorage.forceSync()" style="background: #f59e0b; color: white; border: none; padding: 12px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
+            <i class="fas fa-sync"></i> Force Sync
+        </button>
+    </div>
+
+    <!-- User ID Management -->
+    <div class="user-id-buttons" style="display: flex; gap: 5px; justify-content: center; margin-top: 10px;">
+        <button onclick="renderStorage.showUserId()" style="background: #3b82f6; color: white; border: none; padding: 6px 10px; border-radius: 4px; font-size: 11px; cursor: pointer;">
+            <i class="fas fa-copy"></i> Copy My ID
+        </button>
+        <button onclick="renderStorage.importUserId()" style="background: #8b5cf6; color: white; border: none; padding: 6px 10px; border-radius: 4px; font-size: 11px; cursor: pointer;">
+            <i class="fas fa-download"></i> Import ID
+        </button>
+    </div>
+    
+    <div id="storageStatus" style="margin-top: 15px; font-size: 14px; background: rgba(255,255,255,0.2); padding: 10px; border-radius: 8px;">
+        <div>Status: Initializing Cloud Storage...</div>
+        <div style="font-size: 12px; opacity: 0.9;">User ID: <span id="userIdDisplay">-</span></div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         <!-- EXISTING GOOGLE DRIVE SECTION (Keep as fallback) -->
         <div class="google-drive-section" style="text-align: center; margin: 20px 0; padding: 15px; background: #f8f9fa; border-radius: 10px;">
@@ -656,42 +670,41 @@
 
     <!-- ✅ NEW RENDER STORAGE SCRIPT -->
     <script src="render-storage.js"></script>
+<!-- ✅ ADD THIS SCRIPT before closing body tag -->
+<script>
+// Storage status functions
+async function showStorageStatus() {
+    const status = await renderStorage.getSyncStatus();
+    const statusElement = document.getElementById('storageStatus');
+    
+    if (!statusElement) return;
+    
+    if (status.connected && status.databaseConnected) {
+        let statusHTML = `
+            <div style="color: #4ade80; font-weight: 600;">✅ Cloud Storage Connected</div>
+            <div style="font-size: 12px; margin-top: 5px;">
+                User: ${status.userId}<br>
+                Last Save: ${status.lastSave ? new Date(status.lastSave).toLocaleString() : 'Never'}<br>
+                Last Load: ${status.lastLoad ? new Date(status.lastLoad).toLocaleString() : 'Never'}
+            </div>
+        `;
+        statusElement.innerHTML = statusHTML;
+    } else {
+        statusElement.innerHTML = `
+            <div style="color: #ef4444; font-weight: 600;">❌ Cloud Storage Disconnected</div>
+            <div style="font-size: 12px; margin-top: 5px;">${status.error || 'Check connection'}</div>
+        `;
+    }
+}
 
-    <script>
-        // Storage status functions
-        async function showStorageStatus() {
-            const status = await renderStorage.getSyncStatus();
-            const statusElement = document.getElementById('storageStatus');
-            
-            if (!statusElement) return;
-            
-            if (status.connected && status.databaseConnected) {
-                let statusHTML = `
-                    <div style="color: #4ade80; font-weight: 600;">✅ Cloud Storage Connected</div>
-                    <div style="font-size: 12px; margin-top: 5px;">
-                        User: ${status.userId}<br>
-                        Last Save: ${status.lastSave ? new Date(status.lastSave).toLocaleString() : 'Never'}<br>
-                        Last Load: ${status.lastLoad ? new Date(status.lastLoad).toLocaleString() : 'Never'}<br>
-                        Sync History: ${status.syncHistory.length} records
-                    </div>
-                `;
-                statusElement.innerHTML = statusHTML;
-            } else {
-                statusElement.innerHTML = `
-                    <div style="color: #ef4444; font-weight: 600;">❌ Cloud Storage Disconnected</div>
-                    <div style="font-size: 12px; margin-top: 5px;">${status.error || 'Check connection'}</div>
-                `;
-            }
-        }
-
-        // Auto-update status on page load
-        document.addEventListener('DOMContentLoaded', async () => {
-            // Initial status check
-            setTimeout(showStorageStatus, 2000);
-            
-            // Auto status update every 30 seconds
-            setInterval(showStorageStatus, 30000);
-        });
-    </script>
+// Auto-update status on page load
+document.addEventListener('DOMContentLoaded', async () => {
+    // Initial status check
+    setTimeout(showStorageStatus, 2000);
+    
+    // Auto status update every 30 seconds
+    setInterval(showStorageStatus, 30000);
+});
+</script>
 </body>
 </html>
