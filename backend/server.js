@@ -13,7 +13,7 @@ app.use(cors({
       'http://127.0.0.1:3000',
       'http://localhost:5500',
       'http://127.0.0.1:5500',
-      'https://alishan-inventory.netlify.app',
+      'alishanapp.netlify.app',
       /\.netlify\.app$/,
       /\.onrender\.com$/
     ];
